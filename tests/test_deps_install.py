@@ -84,3 +84,21 @@ def test_no_avisa_si_no_se_puede_consultar():
         raise OSError("sin red")
 
     assert ytdlp_update_available(installed="2026.1.1", fetcher=explota) is None
+
+
+def test_limpia_zip_si_descarga_falla(tmp_path):
+    def descargador_roto(url, hacia, on_progress):
+        hacia.parent.mkdir(parents=True, exist_ok=True)
+        hacia.write_bytes(b"contenido parcial")
+        raise OSError("conexión perdida")
+
+    destino = tmp_path / "bin"
+
+    with pytest.raises(OSError, match="conexión perdida"):
+        install_ffmpeg(
+            on_progress=lambda _: None,
+            dest_dir=destino,
+            downloader=descargador_roto,
+        )
+
+    assert list(destino.glob("*.zip")) == []

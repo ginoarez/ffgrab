@@ -108,10 +108,11 @@ def install_ffmpeg(
     bajar = downloader or _descargar
 
     archivo_zip = destino / "_ffmpeg_descarga.zip"
-    bajar(FFMPEG_URL_WINDOWS, archivo_zip, on_progress)
 
     encontrado: Path | None = None
     try:
+        bajar(FFMPEG_URL_WINDOWS, archivo_zip, on_progress)
+
         with zipfile.ZipFile(archivo_zip) as z:
             for miembro in z.namelist():
                 nombre = Path(miembro).name

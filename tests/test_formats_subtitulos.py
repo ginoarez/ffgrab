@@ -1,5 +1,9 @@
 from core.formats import normalize
-from tests.fixtures.info_dicts import VIDEO_CON_SUBTITULOS, VIDEO_NORMAL
+from tests.fixtures.info_dicts import (
+    VIDEO_CON_SUBTITULOS,
+    VIDEO_MANUAL_ALFABETICAMENTE_POSTERIOR,
+    VIDEO_NORMAL,
+)
 
 
 def test_sin_subtitulos_devuelve_tupla_vacia():
@@ -48,3 +52,26 @@ def test_los_autogenerados_van_despues_de_todos_los_manuales():
     primer_auto = next(i for i, p in enumerate(pistas) if p.is_auto)
     assert all(not p.is_auto for p in pistas[:primer_auto])
     assert all(p.is_auto for p in pistas[primer_auto:])
+
+
+def test_los_autogenerados_van_ordenados():
+    pistas = normalize(VIDEO_CON_SUBTITULOS).subtitles
+    automaticos = [p.lang_code for p in pistas if p.is_auto]
+
+    assert automaticos == ["fr", "pt"]
+
+
+def test_manual_gana_sobre_automatico_incluso_si_alfabeticamente_posterior():
+    pistas = normalize(VIDEO_MANUAL_ALFABETICAMENTE_POSTERIOR).subtitles
+    codigos = [p.lang_code for p in pistas]
+
+    assert codigos == ["zz", "aa"]
+    assert pistas[0].is_auto is False
+    assert pistas[1].is_auto is True
+
+
+def test_secuencia_completa_de_idiomas_en_orden():
+    pistas = normalize(VIDEO_CON_SUBTITULOS).subtitles
+    codigos = [p.lang_code for p in pistas]
+
+    assert codigos == ["en", "es", "fr", "pt"]

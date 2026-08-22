@@ -115,3 +115,21 @@ VIDEO_CON_SUBTITULOS = {
         "fr": [{"ext": "vtt", "url": "https://ejemplo.com/fr-auto.vtt"}],
     },
 }
+
+VIDEO_MANUAL_ALFABETICAMENTE_POSTERIOR = {
+    "id": "stu901",
+    "title": "Manual posterior al automático alfabéticamente",
+    "duration": 300,
+    "thumbnail": "https://ejemplo.com/posterior.jpg",
+    "uploader": "Test",
+    "formats": [
+        {"format_id": "140", "ext": "m4a", "vcodec": "none", "acodec": "mp4a.40.2", "abr": 129},
+        {"format_id": "137", "ext": "mp4", "vcodec": "avc1.640028", "acodec": "none", "height": 1080, "fps": 30, "tbr": 4400},
+    ],
+    "subtitles": {
+        "zz": [{"ext": "vtt", "url": "https://ejemplo.com/zz.vtt", "name": "Zulu"}],
+    },
+    "automatic_captions": {
+        "aa": [{"ext": "vtt", "url": "https://ejemplo.com/aa-auto.vtt", "name": "Afar"}],
+    },
+}

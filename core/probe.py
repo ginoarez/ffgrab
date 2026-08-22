@@ -8,10 +8,11 @@ _OPCIONES = {"quiet": True, "no_warnings": True, "skip_download": True}
 
 _NO_DISPONIBLE = (
     "private video",
+    "is private",
     "video unavailable",
     "has been removed",
     "no longer available",
-    "not available in your country",
+    "available in your country",
     "sign in to confirm your age",
 )
 

@@ -18,7 +18,7 @@ class YdlFalso:
     def __exit__(self, *_):
         return False
 
-    def extract_info(self, url, download=False):
+    def extract_info(self, url, download):
         self.url_recibida = url
         if self._error:
             raise self._error
@@ -39,7 +39,7 @@ def test_nunca_descarga():
     registro = {}
 
     class Espia(YdlFalso):
-        def extract_info(self, url, download=False):
+        def extract_info(self, url, download):
             registro["download"] = download
             return VIDEO_NORMAL
 
@@ -80,7 +80,27 @@ def test_error_desconocido_conserva_el_mensaje():
 
     falso = YdlFalso(error=DownloadError("ERROR: algo raro pasó"))
 
-    with pytest.raises(ProbeError, match="algo raro pasó"):
+    with pytest.raises(ProbeError, match="algo raro pasó") as excinfo:
+        probe("https://ejemplo.com/v/x", ydl_factory=lambda: falso)
+
+    assert type(excinfo.value) is ProbeError
+
+
+def test_video_privado_formato_youtube():
+    from yt_dlp.utils import DownloadError
+
+    falso = YdlFalso(error=DownloadError("ERROR: Video dQw4w9WgXcQ is private"))
+
+    with pytest.raises(VideoUnavailable):
+        probe("https://ejemplo.com/v/x", ydl_factory=lambda: falso)
+
+
+def test_video_bloqueado_geograficamente():
+    from yt_dlp.utils import DownloadError
+
+    falso = YdlFalso(error=DownloadError("ERROR: The uploader has not made this video available in your country"))
+
+    with pytest.raises(VideoUnavailable):
         probe("https://ejemplo.com/v/x", ydl_factory=lambda: falso)
 
 

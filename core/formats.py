@@ -105,6 +105,39 @@ def _calidades(formats: list[dict]) -> tuple[QualityOption, ...]:
     return tuple(opciones)
 
 
+def _nombre_idioma(codigo: str, entradas: list[dict] | None) -> str:
+    for entrada in entradas or []:
+        nombre = entrada.get("name")
+        if nombre:
+            return nombre
+    return codigo
+
+
+def _subtitulos(raw: dict) -> tuple[SubtitleTrack, ...]:
+    """Manuales primero; los autogenerados solo si ese idioma no existe a mano.
+
+    Nunca se mezclan en silencio: is_auto viaja hasta la interfaz para que se
+    muestren etiquetados.
+    """
+    manuales = raw.get("subtitles") or {}
+    automaticos = raw.get("automatic_captions") or {}
+
+    pistas: list[SubtitleTrack] = []
+    vistos: set[str] = set()
+
+    for codigo in sorted(manuales):
+        vistos.add(codigo)
+        pistas.append(SubtitleTrack(codigo, _nombre_idioma(codigo, manuales[codigo]), False))
+
+    for codigo in sorted(automaticos):
+        if codigo in vistos:
+            continue
+        vistos.add(codigo)
+        pistas.append(SubtitleTrack(codigo, _nombre_idioma(codigo, automaticos[codigo]), True))
+
+    return tuple(pistas)
+
+
 def normalize(raw: dict) -> VideoInfo:
     """Traduce el diccionario crudo de yt-dlp a algo que una interfaz pueda pintar."""
     formats = raw.get("formats") or []
@@ -115,5 +148,5 @@ def normalize(raw: dict) -> VideoInfo:
         thumbnail_url=raw.get("thumbnail") or "",
         uploader=raw.get("uploader") or "",
         qualities=_calidades(formats),
-        subtitles=(),  # Task 4
+        subtitles=_subtitulos(raw),
     )

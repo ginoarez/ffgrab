@@ -94,3 +94,24 @@ VIDEO_MISMO_CODEC_DISTINTO_BITRATE = {
     "subtitles": {},
     "automatic_captions": {},
 }
+
+VIDEO_CON_SUBTITULOS = {
+    "id": "pqr678",
+    "title": "Charla con subtitulos",
+    "duration": 1800,
+    "thumbnail": "https://ejemplo.com/charla.jpg",
+    "uploader": "Conferencia",
+    "formats": [
+        {"format_id": "140", "ext": "m4a", "vcodec": "none", "acodec": "mp4a.40.2", "abr": 129},
+        {"format_id": "137", "ext": "mp4", "vcodec": "avc1.640028", "acodec": "none", "height": 1080, "fps": 30, "tbr": 4400},
+    ],
+    "subtitles": {
+        "es": [{"ext": "vtt", "url": "https://ejemplo.com/es.vtt", "name": "Español"}],
+        "en": [{"ext": "vtt", "url": "https://ejemplo.com/en.vtt", "name": "English"}],
+    },
+    "automatic_captions": {
+        "es": [{"ext": "vtt", "url": "https://ejemplo.com/es-auto.vtt", "name": "Español (generado automáticamente)"}],
+        "pt": [{"ext": "vtt", "url": "https://ejemplo.com/pt-auto.vtt", "name": "Português"}],
+        "fr": [{"ext": "vtt", "url": "https://ejemplo.com/fr-auto.vtt"}],
+    },
+}

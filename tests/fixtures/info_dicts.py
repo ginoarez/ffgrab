@@ -79,3 +79,18 @@ VIDEO_SIN_AUDIO_EMPAREJABLE = {
     "subtitles": {},
     "automatic_captions": {},
 }
+
+VIDEO_MISMO_CODEC_DISTINTO_BITRATE = {
+    "id": "pqr678",
+    "title": "Mismo codec, diferente bitrate",
+    "duration": 120,
+    "thumbnail": "https://ejemplo.com/bitrate.jpg",
+    "uploader": "Prueba de bitrate",
+    "formats": [
+        {"format_id": "140", "ext": "m4a", "vcodec": "none", "acodec": "mp4a.40.2", "abr": 129, "filesize": 2_000_000},
+        {"format_id": "720p-low", "ext": "mp4", "vcodec": "avc1.4d401f", "acodec": "none", "height": 720, "fps": 30, "tbr": 1800, "filesize": 20_000_000},
+        {"format_id": "720p-high", "ext": "mp4", "vcodec": "avc1.4d401f", "acodec": "none", "height": 720, "fps": 30, "tbr": 2500, "filesize": 28_000_000},
+    ],
+    "subtitles": {},
+    "automatic_captions": {},
+}

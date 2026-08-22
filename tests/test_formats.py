@@ -3,6 +3,7 @@ from tests.fixtures.info_dicts import (
     FORMATOS_ROTOS,
     SOLO_AUDIO,
     VIDEO_4K_60FPS,
+    VIDEO_MISMO_CODEC_DISTINTO_BITRATE,
     VIDEO_NORMAL,
     VIDEO_SIN_AUDIO_EMPAREJABLE,
 )
@@ -78,3 +79,19 @@ def test_descarta_alturas_sin_audio_emparejable():
     info = normalize(VIDEO_SIN_AUDIO_EMPAREJABLE)
 
     assert info.qualities == ()
+
+
+def test_elige_mayor_tbr_cuando_el_codec_es_igual():
+    """Verifica que el tiebreak por tbr funciona cuando dos formatos tienen el mismo codec."""
+    info = normalize(VIDEO_MISMO_CODEC_DISTINTO_BITRATE)
+    setecientos_veinte = next(q for q in info.qualities if q.height == 720)
+
+    assert setecientos_veinte.video_format_id == "720p-high"
+
+
+def test_filesize_approx_se_copia_correctamente():
+    """Verifica que el tamaño aproximado del archivo se copia desde el formato original."""
+    info = normalize(VIDEO_NORMAL)
+    mil_ochenta = next(q for q in info.qualities if q.height == 1080)
+
+    assert mil_ochenta.filesize_approx == 60_000_000

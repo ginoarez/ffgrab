@@ -84,24 +84,28 @@ class DownloadQueue:
         try:
             salida = self._runner(job, self._progreso_de(job))
         except JobCancelled:
-            job.state = JobState.CANCELLED
+            with self._lock:
+                job.state = JobState.CANCELLED
         except Exception as error:
-            job.state = JobState.FAILED
-            job.error = str(error)
+            with self._lock:
+                job.state = JobState.FAILED
+                job.error = str(error)
         else:
-            job.state = JobState.DONE
-            job.progress = 100.0
-            job.output_path = str(salida)
+            with self._lock:
+                job.state = JobState.DONE
+                job.progress = 100.0
+                job.output_path = str(salida)
 
         self._on_change(job)
         return job
 
     def _progreso_de(self, job: Job) -> Callable[[float, str], None]:
         def reportar(porcentaje: float, velocidad: str = "") -> None:
-            if job.id in self._cancelados:
-                raise JobCancelled()
-            job.progress = porcentaje
-            job.speed = velocidad
+            with self._lock:
+                if job.id in self._cancelados:
+                    raise JobCancelled()
+                job.progress = porcentaje
+                job.speed = velocidad
             self._on_change(job)
 
         return reportar

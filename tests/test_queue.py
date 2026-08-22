@@ -151,3 +151,26 @@ def test_cancelar_un_id_inexistente_no_explota():
     cola = DownloadQueue(runner=runner_exitoso)
 
     cola.cancel(999)  # no debe lanzar
+
+
+def test_el_progreso_intermedio_se_reporta():
+    """Verifica que los valores intermedios de progreso se reflejen en el job.
+
+    Si se removiera la línea 'job.progress = porcentaje' de reportar(),
+    este test fallaría porque solo vería 0.0 y 100.0, no 50.0.
+    """
+    progresos = []
+
+    def runner(job, on_progress):
+        on_progress(50.0, "1.2MiB/s")
+        return "/salida/intermedio.mp4"
+
+    cola = DownloadQueue(
+        runner=runner,
+        on_change=lambda j: progresos.append(j.progress)
+    )
+    cola.enqueue("https://ejemplo.com/a", "A", {})
+    cola.run_next()
+
+    # Debe haber capturado el progreso intermedio de 50.0, no solo 0.0 y 100.0
+    assert 50.0 in progresos, f"Progreso intermedio 50.0 no encontrado en {progresos}"

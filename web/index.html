@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>FFGrab</title>
+</head>
+<body>
+  <div id="app">Cargando…</div>
+  <script>
+    window.onJobChange = function (job) { console.log("job", job); };
+    window.onFfmpegProgress = function (pct) { console.log("ffmpeg", pct); };
+  </script>
+</body>
+</html>

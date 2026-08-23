@@ -141,6 +141,24 @@
     };
   };
 
+  /* --- sesion (cookies) ---
+     Muchos sitios rechazan la consulta anonima con una verificacion anti-bot.
+     Leer las cookies del navegador donde ya hay sesion iniciada es el
+     mecanismo que soporta yt-dlp para saltarla. */
+  $("cookies").addEventListener("change", async function () {
+    var origen = $("cookies").value;
+    var r = await window.FFGrab.call("set_cookies", origen);
+    var hint = $("cookies-hint");
+    if (r && r.ok === false) {
+      hint.textContent = "No se pudo usar esa sesión: " + r.error;
+      hint.classList.remove("hidden");
+      return;
+    }
+    hint.classList.add("hidden");
+    var url = $("url").value.trim();
+    if (url) consultar(url);   // reintenta con la sesion nueva
+  });
+
   /* --- carpeta de destino --- */
   async function mostrarCarpeta(ruta) {
     if (typeof ruta !== "string" || !ruta) {

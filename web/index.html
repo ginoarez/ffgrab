@@ -22,6 +22,18 @@
           <input type="text" id="url" placeholder="pega tu link aquí…" autocomplete="off">
         </div>
 
+        <div class="field">
+          <div class="label">Sesión</div>
+          <select id="cookies">
+            <option value="ninguno">Sin sesión</option>
+            <option value="firefox">Cookies de Firefox</option>
+            <option value="chrome">Cookies de Chrome</option>
+            <option value="edge">Cookies de Edge</option>
+            <option value="brave">Cookies de Brave</option>
+          </select>
+          <div id="cookies-hint" class="empty hidden" style="text-align:left;padding:8px 0 0"></div>
+        </div>
+
         <div id="probe-error" class="empty hidden"></div>
 
         <div id="details" class="hidden">

@@ -19,24 +19,66 @@ def test_deps_status_serializa_a_json(api, monkeypatch):
         "app.deps.ffmpeg_status",
         lambda: FFmpegStatus(FFmpegState.FOUND, Path("/x/ffmpeg.exe"), "ffmpeg version 8.1.1"),
     )
-    monkeypatch.setattr("app.deps.ytdlp_update_available", lambda: None)
 
     resultado = api.deps_status()
 
     assert resultado["ok"] is True
     assert resultado["ffmpeg"] == "found"
     assert resultado["version"] == "ffmpeg version 8.1.1"
-    assert resultado["ytdlp_update"] is None
+    assert "ytdlp_update" not in resultado
 
 
 def test_deps_status_informa_ffmpeg_ausente(api, monkeypatch):
     monkeypatch.setattr("app.deps.ffmpeg_status", lambda: FFmpegStatus(FFmpegState.MISSING))
-    monkeypatch.setattr("app.deps.ytdlp_update_available", lambda: "2026.8.19")
 
     resultado = api.deps_status()
 
     assert resultado["ffmpeg"] == "missing"
-    assert resultado["ytdlp_update"] == "2026.8.19"
+
+
+def test_deps_status_no_consulta_ytdlp_update_available(api, monkeypatch):
+    """deps_status es lo que la compuerta espera para mostrar la app: no
+    debe depender de una llamada de red a PyPI (ytdlp_update_available),
+    que tiene su propio timeout de 10s y puede colgarse sin red."""
+    def explota():
+        raise AssertionError("deps_status no debe llamar a ytdlp_update_available")
+
+    monkeypatch.setattr(
+        "app.deps.ffmpeg_status",
+        lambda: FFmpegStatus(FFmpegState.FOUND, Path("/x/ffmpeg.exe"), "ffmpeg version 8.1.1"),
+    )
+    monkeypatch.setattr("app.deps.ytdlp_update_available", explota)
+
+    resultado = api.deps_status()
+
+    assert resultado["ok"] is True
+
+
+def test_ytdlp_update_devuelve_la_version_nueva(api, monkeypatch):
+    monkeypatch.setattr("app.deps.ytdlp_update_available", lambda: "2026.8.19")
+
+    resultado = api.ytdlp_update()
+
+    assert resultado == {"ok": True, "update": "2026.8.19"}
+
+
+def test_ytdlp_update_devuelve_none_si_esta_al_dia(api, monkeypatch):
+    monkeypatch.setattr("app.deps.ytdlp_update_available", lambda: None)
+
+    resultado = api.ytdlp_update()
+
+    assert resultado == {"ok": True, "update": None}
+
+
+def test_ytdlp_update_convierte_errores_en_respuesta(api, monkeypatch):
+    def explota():
+        raise RuntimeError("fallo simulado consultando PyPI")
+
+    monkeypatch.setattr("app.deps.ytdlp_update_available", explota)
+
+    resultado = api.ytdlp_update()
+
+    assert resultado["ok"] is False
 
 
 def test_probe_devuelve_diccionarios_planos(api, monkeypatch):

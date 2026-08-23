@@ -51,8 +51,19 @@ class Api:
                 "ffmpeg": estado.state.value,
                 "path": str(estado.path) if estado.path else None,
                 "version": estado.version,
-                "ytdlp_update": deps.ytdlp_update_available(),
             }
+        except Exception as error:
+            return {"ok": False, "error": str(error)}
+
+    def ytdlp_update(self) -> dict:
+        """Separado de deps_status a propósito: consulta PyPI con un timeout
+        de 10s, y deps_status es lo que la compuerta espera para mostrar la
+        app. Bombeada junto a deps_status, un PyPI lento o inalcanzable
+        retrasaba la compuerta ~10s sin ninguna razón relacionada con
+        ffmpeg. Se llama aparte, después de que la compuerta ya se abrió.
+        """
+        try:
+            return {"ok": True, "update": deps.ytdlp_update_available()}
         except Exception as error:
             return {"ok": False, "error": str(error)}
 

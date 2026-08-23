@@ -233,14 +233,20 @@
       return;
     }
     $("gate").classList.add("hidden");
+    $("app").classList.remove("hidden");
 
-    if (estado.ytdlp_update) {
-      $("ytdlp-text").textContent =
-        "Hay una versión nueva de yt-dlp (" + estado.ytdlp_update + "). " +
-        "Los sitios cambian seguido y una copia vieja deja de funcionar. " +
-        "Actualízala corriendo: pip install -U yt-dlp";
-      $("ytdlp-banner").classList.remove("hidden");
-    }
+    revisarActualizacionYtdlp();  // aparte: no debe retrasar la compuerta
+  }
+
+  async function revisarActualizacionYtdlp() {
+    var r = await window.FFGrab.call("ytdlp_update");
+    if (!r || r.ok !== true || !r.update) return;
+
+    $("ytdlp-text").textContent =
+      "Hay una versión nueva de yt-dlp (" + r.update + "). " +
+      "Los sitios cambian seguido y una copia vieja deja de funcionar. " +
+      "Actualízala corriendo: pip install -U yt-dlp";
+    $("ytdlp-banner").classList.remove("hidden");
   }
 
   $("gate-install").addEventListener("click", async function () {

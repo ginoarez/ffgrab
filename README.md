@@ -17,11 +17,19 @@ Descargador de video de escritorio: eliges calidad, formato, subtítulos e idiom
 ```bash
 git clone <url>
 cd ffgrab
-pip install -r requirements.txt
-python app.py
 ```
 
+Y en Windows, doble clic en **`run.bat`** (o `run.bat` desde la terminal). Crea un
+entorno local, instala las dependencias la primera vez y abre la app.
+
 Necesitas Python 3.11 o superior.
+
+> **Por qué un `.bat` y no `python app.py`.** En Windows suelen convivir varios
+> Python: el de la Microsoft Store, el de python.org, entornos virtuales. Si
+> `python` resuelve a uno que no tiene las dependencias, la ventana abre igual
+> pero consultar un enlace se queda colgado para siempre, sin decir por qué. El
+> lanzador fija el intérprete y evita ese fallo, que es difícil de diagnosticar
+> precisamente porque la app *parece* arrancar bien.
 
 ## Sobre ffmpeg
 

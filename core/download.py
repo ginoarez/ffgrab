@@ -68,6 +68,10 @@ def build_opts(options: dict, ffmpeg_path: str, outdir: Path) -> dict:
     opts: dict = {
         "quiet": True,
         "no_warnings": True,
+        # Sin esto yt-dlp escupe una linea de progreso por fragmento a la
+        # terminal: cientos de lineas por descarga. El progreso ya viaja a
+        # la ventana por progress_hooks.
+        "noprogress": True,
         "noplaylist": True,
         "ffmpeg_location": str(ffmpeg_path),
         "outtmpl": str(Path(outdir) / "%(title)s.%(ext)s"),

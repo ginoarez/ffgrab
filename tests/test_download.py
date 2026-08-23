@@ -244,3 +244,8 @@ def test_run_no_divide_por_cero_sin_tamano_total(tmp_path):
     run(job, lambda p, v: reportes.append(p), FFMPEG, tmp_path, ydl_factory=YdlFalso)
 
     assert reportes == [0.0]
+
+
+def test_no_escupe_progreso_a_la_terminal():
+    """El progreso va a la ventana por hooks, no a stdout."""
+    assert build_opts(_video(), FFMPEG, SALIDA)["noprogress"] is True

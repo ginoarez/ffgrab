@@ -8,10 +8,93 @@
   <link rel="stylesheet" href="css/layout.css">
 </head>
 <body>
-  <div id="app">Cargando…</div>
-  <script>
-    window.onJobChange = function (job) { console.log("job", job); };
-    window.onFfmpegProgress = function (pct) { console.log("ffmpeg", pct); };
-  </script>
+  <div id="app">
+    <div class="titlebar"><strong>FFGrab</strong><span id="outdir-label"></span></div>
+
+    <div id="ytdlp-banner" class="neu-sm banner hidden">
+      <span id="ytdlp-text"></span>
+    </div>
+
+    <div class="columns">
+      <div class="neu panel panel-left">
+        <div class="field">
+          <div class="label">Enlace</div>
+          <input type="text" id="url" placeholder="pega tu link aquí…" autocomplete="off">
+        </div>
+
+        <div id="probe-error" class="empty hidden"></div>
+
+        <div id="details" class="hidden">
+          <img id="thumb" class="thumb" alt="">
+          <div class="meta-title" id="meta-title"></div>
+          <div class="meta-sub" id="meta-sub"></div>
+
+          <div class="field">
+            <div class="label">Modo</div>
+            <div class="row">
+              <button class="chip" id="mode-video" aria-pressed="true">Video</button>
+              <button class="chip" id="mode-audio" aria-pressed="false">Solo audio</button>
+            </div>
+          </div>
+
+          <div id="video-controls">
+            <div class="field">
+              <div class="label">Calidad</div>
+              <select id="quality"></select>
+            </div>
+            <div class="field">
+              <div class="label">Contenedor</div>
+              <div class="row">
+                <button class="chip" id="cont-mp4" aria-pressed="true">mp4</button>
+                <button class="chip" id="cont-mkv" aria-pressed="false">mkv</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="audio-controls" class="hidden">
+            <div class="field">
+              <div class="label">Formato de audio</div>
+              <div class="row">
+                <button class="chip" id="aud-mp3" aria-pressed="true">mp3</button>
+                <button class="chip" id="aud-m4a" aria-pressed="false">m4a</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field" id="subs-field">
+            <div class="label">Subtítulos</div>
+            <select id="subtitle"></select>
+            <label class="toggle">
+              <input type="checkbox" id="embed-subs" checked><span class="box"></span>
+              Incrustar en el video
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="keep-srt" checked><span class="box"></span>
+              Guardar archivo .srt aparte
+            </label>
+            <div id="mp4-warning" class="empty hidden" style="text-align:left;padding:8px 0 0">
+              MP4 soporta subtítulos incrustados de forma limitada y algunos
+              reproductores los ignoran. MKV no tiene ese problema.
+            </div>
+          </div>
+
+          <button class="btn-primary" id="add">Añadir a la cola</button>
+        </div>
+
+        <div id="placeholder" class="empty">
+          Pega un enlace arriba para empezar.
+        </div>
+      </div>
+
+      <div class="neu panel panel-right">
+        <div class="label">Cola</div>
+        <div id="queue"></div>
+        <div id="queue-empty" class="empty">Nada en la cola todavía.</div>
+      </div>
+    </div>
+  </div>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/queue-view.js"></script>
 </body>
 </html>

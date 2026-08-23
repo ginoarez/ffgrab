@@ -14,3 +14,16 @@ window.FFGrab = {
     }
   },
 };
+
+window.FFGrab.alEstarListo = function (fn) {
+  function listo() {
+    return !!(window.pywebview && window.pywebview.api
+              && typeof window.pywebview.api.deps_status === "function");
+  }
+  if (listo()) { fn(); return; }
+  var intentos = 0;
+  var t = setInterval(function () {
+    if (listo()) { clearInterval(t); fn(); }
+    else if (++intentos > 100) { clearInterval(t); }   // ~5s y se rinde
+  }, 50);
+};

@@ -143,7 +143,10 @@
 
   /* --- carpeta de destino --- */
   async function mostrarCarpeta(ruta) {
-    if (typeof ruta !== "string" || !ruta) return;
+    if (typeof ruta !== "string" || !ruta) {
+      console.warn("mostrarCarpeta: valor no usable", ruta);
+      return;
+    }
     const corta = ruta.length > 46 ? "…" + ruta.slice(-45) : ruta;
     $("outdir-label").textContent = "Guardando en " + corta;
     $("outdir-label").title = ruta;
@@ -158,11 +161,7 @@
     mostrarCarpeta(await window.FFGrab.call("current_folder"));
   }
 
-  if (window.pywebview && window.pywebview.api) {
-    alArrancar();
-  } else {
-    window.addEventListener("pywebviewready", alArrancar);
-  }
+  window.FFGrab.alEstarListo(alArrancar);
 
   /* --- eventos --- */
   let temporizador = null;

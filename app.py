@@ -37,6 +37,7 @@ class Api:
         self._window = None
         self._outdir = Path(outdir) if outdir else Path.home() / "Downloads"
         self._queue = DownloadQueue(runner=self._ejecutar, on_change=self._empujar)
+        self._cookies: dict = {}
         self._despierta = threading.Event()
         self._worker: threading.Thread | None = None
 
@@ -64,9 +65,27 @@ class Api:
 
     # ---- consulta ----
 
+    def set_cookies(self, origen: str) -> dict:
+        """Elige de donde sacar la sesion para sitios que exigen login.
+
+        Muchos sitios responden a una consulta anonima con una verificacion
+        anti-bot. Leer las cookies del navegador donde ya iniciaste sesion es
+        el mecanismo que soporta yt-dlp para saltarla.
+        """
+        try:
+            if not origen or origen == "ninguno":
+                self._cookies = {}
+            elif origen.startswith("archivo:"):
+                self._cookies = {"cookiefile": origen.split(":", 1)[1]}
+            else:
+                self._cookies = {"cookiesfrombrowser": (origen,)}
+        except Exception as error:
+            return {"ok": False, "error": str(error)}
+        return {"ok": True, "origen": origen or "ninguno"}
+
     def probe(self, url: str) -> dict:
         try:
-            info = probe_mod.probe(url)
+            info = probe_mod.probe(url, cookies=self._cookies)
         except Exception as error:
             return {"ok": False, "error": str(error)}
 
@@ -132,6 +151,8 @@ class Api:
         if estado.path is None:
             raise RuntimeError("ffmpeg no está disponible.")
         self._outdir.mkdir(parents=True, exist_ok=True)
+        # La descarga necesita la misma sesion que la consulta.
+        job.options["cookies"] = self._cookies
         return download_mod.run(job, on_progress, str(estado.path), self._outdir)
 
     def _empujar(self, job: Job) -> None:

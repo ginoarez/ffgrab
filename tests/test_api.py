@@ -42,7 +42,9 @@ def test_deps_status_informa_ffmpeg_ausente(api, monkeypatch):
 def test_probe_devuelve_diccionarios_planos(api, monkeypatch):
     from core.formats import normalize
 
-    monkeypatch.setattr("app.probe_mod.probe", lambda url: normalize(VIDEO_CON_SUBTITULOS))
+    monkeypatch.setattr(
+        "app.probe_mod.probe", lambda url, cookies=None: normalize(VIDEO_CON_SUBTITULOS)
+    )
 
     resultado = api.probe("https://ejemplo.com/v/x")
 
@@ -57,7 +59,7 @@ def test_probe_devuelve_diccionarios_planos(api, monkeypatch):
 def test_probe_convierte_errores_en_respuesta(api, monkeypatch):
     from core.probe import UnsupportedSite
 
-    def explota(url):
+    def explota(url, cookies=None):
         raise UnsupportedSite("Ese enlace no pertenece a ningún sitio soportado.")
 
     monkeypatch.setattr("app.probe_mod.probe", explota)

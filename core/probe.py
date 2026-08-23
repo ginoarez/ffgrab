@@ -42,12 +42,25 @@ def _traducir(error: Exception) -> ProbeError:
     return ProbeError(mensaje.replace("ERROR: ", "", 1))
 
 
-def probe(url: str, ydl_factory: Callable | None = None) -> VideoInfo:
-    """Consulta qué ofrece un enlace, sin descargar nada."""
+def probe(
+    url: str,
+    ydl_factory: Callable | None = None,
+    cookies: dict | None = None,
+) -> VideoInfo:
+    """Consulta qué ofrece un enlace, sin descargar nada.
+
+    `cookies` son opciones de yt-dlp para autenticarse (por ejemplo
+    `cookiesfrombrowser`). Muchos sitios bloquean la consulta anónima con
+    una verificación anti-bot, así que la autenticación hace falta aquí y
+    no solo al descargar.
+    """
     if ydl_factory is None:
         from yt_dlp import YoutubeDL
 
-        ydl_factory = lambda: YoutubeDL(_OPCIONES)  # noqa: E731
+        opciones = dict(_OPCIONES)
+        if cookies:
+            opciones.update(cookies)
+        ydl_factory = lambda: YoutubeDL(opciones)  # noqa: E731
 
     from yt_dlp.utils import DownloadError
 

@@ -73,6 +73,11 @@ def build_opts(options: dict, ffmpeg_path: str, outdir: Path) -> dict:
         "outtmpl": str(Path(outdir) / "%(title)s.%(ext)s"),
     }
 
+    # Autenticacion: sin ella muchos sitios rechazan la descarga con una
+    # verificacion anti-bot, igual que hacen con la consulta.
+    cookies = options.get("cookies") or {}
+    opts.update(cookies)
+
     if options["mode"] == "audio":
         opts["format"] = "bestaudio/best"
         opts["postprocessors"] = [

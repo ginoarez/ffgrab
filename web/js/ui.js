@@ -220,7 +220,18 @@
 
   async function revisarDependencias() {
     var estado = await window.FFGrab.call("deps_status");
-    if (!estado || estado.ok !== true) return;
+    if (!estado || estado.ok !== true) {
+      // Sin esto, #gate y #app quedan ambos ocultos y la ventana se queda en
+      // blanco para siempre, sin decir nada. Una ventana muda es peor que un
+      // error: no da ni el sintoma con el que buscar ayuda.
+      $("gate-title").textContent = "No se pudo comprobar ffmpeg";
+      $("gate-text").textContent =
+        "FFGrab no pudo determinar si ffmpeg está disponible" +
+        (estado && estado.error ? ": " + estado.error : ".") +
+        " Puedes intentar descargarlo de todas formas.";
+      $("gate").classList.remove("hidden");
+      return;
+    }
 
     if (estado.ffmpeg !== "found") {
       if (estado.ffmpeg === "broken") {

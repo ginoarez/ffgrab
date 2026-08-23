@@ -143,7 +143,7 @@
 
   /* --- carpeta de destino --- */
   async function mostrarCarpeta(ruta) {
-    if (!ruta) return;
+    if (typeof ruta !== "string" || !ruta) return;
     const corta = ruta.length > 46 ? "…" + ruta.slice(-45) : ruta;
     $("outdir-label").textContent = "Guardando en " + corta;
     $("outdir-label").title = ruta;
@@ -151,12 +151,18 @@
 
   $("outdir-label").addEventListener("click", async () => {
     const elegida = await window.FFGrab.call("choose_folder");
-    if (elegida) mostrarCarpeta(elegida);
+    mostrarCarpeta(elegida);
   });
 
-  window.addEventListener("pywebviewready", async () => {
+  async function alArrancar() {
     mostrarCarpeta(await window.FFGrab.call("current_folder"));
-  });
+  }
+
+  if (window.pywebview && window.pywebview.api) {
+    alArrancar();
+  } else {
+    window.addEventListener("pywebviewready", alArrancar);
+  }
 
   /* --- eventos --- */
   let temporizador = null;

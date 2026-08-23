@@ -73,6 +73,24 @@ class DownloadQueue:
             job.state = JobState.CANCELLED
         self._on_change(job)
 
+    def retry(self, job_id: int) -> None:
+        """Vuelve a poner en cola un trabajo terminado en FAILED o CANCELLED.
+
+        DONE y RUNNING se ignoran: reintentar uno que ya terminó bien no
+        tiene sentido, y uno que corre no está en un estado terminal del
+        que "reintentar" pueda partir. Un id inexistente tampoco hace nada.
+        """
+        with self._lock:
+            job = next((j for j in self._jobs if j.id == job_id), None)
+            if job is None or job.state not in (JobState.FAILED, JobState.CANCELLED):
+                return
+            self._cancelados.discard(job_id)
+            job.state = JobState.PENDING
+            job.error = None
+            job.progress = 0.0
+            job.speed = ""
+        self._on_change(job)
+
     def run_next(self) -> Job | None:
         with self._lock:
             job = next((j for j in self._jobs if j.state is JobState.PENDING), None)

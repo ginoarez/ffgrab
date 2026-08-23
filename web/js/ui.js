@@ -237,7 +237,8 @@
     if (estado.ytdlp_update) {
       $("ytdlp-text").textContent =
         "Hay una versión nueva de yt-dlp (" + estado.ytdlp_update + "). " +
-        "Los sitios cambian seguido y una copia vieja deja de funcionar.";
+        "Los sitios cambian seguido y una copia vieja deja de funcionar. " +
+        "Actualízala corriendo: pip install -U yt-dlp";
       $("ytdlp-banner").classList.remove("hidden");
     }
   }

@@ -19,7 +19,10 @@
       <div class="progress"><div class="progress-fill"></div></div>
       <div class="job-foot">
         <span class="job-state"></span>
-        <button class="job-cancel">Cancelar</button>
+        <div class="job-actions">
+          <button class="job-retry hidden">Reintentar</button>
+          <button class="job-cancel">Cancelar</button>
+        </div>
       </div>`;
     nodo.querySelector(".job-cancel").addEventListener("click", async () => {
       // Sin mirar la respuesta, un fallo del backend dejaria al usuario
@@ -28,6 +31,16 @@
       if (r && r.ok === false) {
         const estado = nodo.querySelector(".job-state");
         estado.textContent = "No se pudo cancelar: " + r.error;
+        estado.title = r.error;
+      }
+    });
+    nodo.querySelector(".job-retry").addEventListener("click", async () => {
+      // Mismo cuidado que el boton de cancelar: un fallo silencioso deja
+      // un boton muerto sin ninguna pista de por que no paso nada.
+      const r = await window.FFGrab.call("retry", job.id);
+      if (r && r.ok === false) {
+        const estado = nodo.querySelector(".job-state");
+        estado.textContent = "No se pudo reintentar: " + r.error;
         estado.title = r.error;
       }
     });
@@ -55,7 +68,9 @@
     }
 
     const terminado = ["done", "failed", "cancelled"].includes(job.state);
+    const puedeReintentar = job.state === "failed" || job.state === "cancelled";
     nodo.querySelector(".job-cancel").classList.toggle("hidden", terminado);
+    nodo.querySelector(".job-retry").classList.toggle("hidden", !puedeReintentar);
 
     vacio.classList.add("hidden");
   }

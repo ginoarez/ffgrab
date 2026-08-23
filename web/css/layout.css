@@ -71,7 +71,12 @@
   color: var(--ink-soft);
 }
 
-.job-cancel {
+.job-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.job-cancel, .job-retry {
   background: none;
   border: none;
   color: var(--ink-soft);
@@ -81,6 +86,7 @@
 }
 
 .job-cancel:hover { color: var(--danger); }
+.job-retry:hover { color: var(--ink); }
 .job.done   .progress-fill { opacity: 0.4; }
 .job.failed .job-foot { color: var(--danger); }
 

@@ -62,6 +62,8 @@ Esta herramienta es para contenido que tienes derecho a descargar. Respetar los 
 
 Playlists y canales completos · subtítulos incrustados sobre la imagen (burn-in) · empaquetado a `.exe` con PyInstaller · descargas paralelas configurables · recordar preferencias entre sesiones.
 
+**Deliberadamente fuera de esta versión:** un botón para actualizar yt-dlp desde la propia app. El aviso te dice que hay una versión nueva, pero actualizarla es correr `pip install -U yt-dlp` a mano. Correr `pip install` contra el propio intérprete en caliente, en medio de una sesión que puede tener una descarga corriendo, es frágil, y un paquete a medio actualizar bajo un proceso que sigue vivo es un mal modo de fallar. Mejor decir la verdad en el aviso que fingir que hay un botón.
+
 ## Licencia
 
 MIT — ver [LICENSE](LICENSE).

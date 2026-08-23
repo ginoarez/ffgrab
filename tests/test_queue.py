@@ -153,6 +153,103 @@ def test_cancelar_un_id_inexistente_no_explota():
     cola.cancel(999)  # no debe lanzar
 
 
+def test_retry_de_un_fallido_vuelve_a_pending_y_se_puede_correr():
+    cola = DownloadQueue(runner=runner_que_falla)
+    job = cola.enqueue("https://ejemplo.com/a", "Roto", {})
+    cola.run_next()
+    assert job.state is JobState.FAILED
+
+    cola.retry(job.id)
+
+    assert job.state is JobState.PENDING
+    assert job.error is None
+    assert job.progress == 0.0
+    assert job.speed == ""
+
+    # y el bombeo lo vuelve a tomar
+    cola2 = DownloadQueue(runner=runner_exitoso)
+    cola2.enqueue("https://ejemplo.com/a", "Segunda vuelta", {})
+    otro = cola2.run_next()
+    assert otro.state is JobState.DONE
+
+
+def test_retry_de_un_fallido_se_reprocesa_en_la_misma_cola():
+    intentos = {"n": 0}
+
+    def runner(job, on_progress):
+        intentos["n"] += 1
+        if intentos["n"] == 1:
+            raise RuntimeError("primer intento falla")
+        return "/salida/ok.mp4"
+
+    cola = DownloadQueue(runner=runner)
+    job = cola.enqueue("https://ejemplo.com/a", "A", {})
+
+    cola.run_next()
+    assert job.state is JobState.FAILED
+
+    cola.retry(job.id)
+    assert job.state is JobState.PENDING
+
+    resultado = cola.run_next()
+    assert resultado.state is JobState.DONE
+    assert resultado.output_path == "/salida/ok.mp4"
+
+
+def test_retry_de_un_cancelado_vuelve_a_pending():
+    def runner(job, on_progress):
+        # si retry() no limpiara el id de _cancelados, esto lanzaria
+        # JobCancelled de nuevo pese a haber sido reencolado.
+        on_progress(10.0, "")
+        return "/salida/x.mp4"
+
+    cola = DownloadQueue(runner=runner)
+    job = cola.enqueue("https://ejemplo.com/a", "A", {})
+    cola.cancel(job.id)
+    assert job.state is JobState.CANCELLED
+
+    cola.retry(job.id)
+
+    assert job.state is JobState.PENDING
+    resultado = cola.run_next()
+    assert resultado.state is JobState.DONE
+
+
+def test_retry_de_un_terminado_no_hace_nada():
+    cola = DownloadQueue(runner=runner_exitoso)
+    cola.enqueue("https://ejemplo.com/a", "A", {})
+    job = cola.run_next()
+    assert job.state is JobState.DONE
+
+    cola.retry(job.id)
+
+    assert job.state is JobState.DONE
+
+
+def test_retry_de_uno_corriendo_no_hace_nada():
+    referencia = {}
+
+    def runner(job, on_progress):
+        # mientras "corre", intentar reintentarlo no debe alterar su estado
+        referencia["cola"].retry(job.id)
+        assert job.state is JobState.RUNNING
+        return "/salida/x.mp4"
+
+    cola = DownloadQueue(runner=runner)
+    referencia["cola"] = cola
+    job = cola.enqueue("https://ejemplo.com/a", "A", {})
+
+    cola.run_next()
+
+    assert job.state is JobState.DONE  # siguió su curso normal
+
+
+def test_retry_de_un_id_inexistente_no_explota():
+    cola = DownloadQueue(runner=runner_exitoso)
+
+    cola.retry(999)  # no debe lanzar
+
+
 def test_el_progreso_intermedio_se_reporta():
     """Verifica que los valores intermedios de progreso se reflejen en el job.
 

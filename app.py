@@ -127,6 +127,13 @@ class Api:
             return {"ok": False, "error": str(error)}
         return {"ok": True}
 
+    def retry(self, job_id: int) -> dict:
+        try:
+            self._queue.retry(int(job_id))
+        except Exception as error:
+            return {"ok": False, "error": str(error)}
+        return {"ok": True}
+
     def current_folder(self) -> str:
         return str(self._outdir)
 

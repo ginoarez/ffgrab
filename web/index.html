@@ -8,6 +8,20 @@
   <link rel="stylesheet" href="css/layout.css">
 </head>
 <body>
+<div id="gate" class="gate hidden">
+  <div class="neu gate-card">
+    <h1 id="gate-title">Falta ffmpeg</h1>
+    <p id="gate-text">
+      FFGrab necesita ffmpeg para unir el video con el audio y para convertir
+      formatos. Puedo descargarlo ahora en una carpeta del propio proyecto, sin
+      instalar nada en tu sistema.
+    </p>
+    <div class="progress hidden" id="gate-progress">
+      <div class="progress-fill" id="gate-fill"></div>
+    </div>
+    <button class="btn-primary" id="gate-install">Descargar ffmpeg</button>
+  </div>
+</div>
   <div id="app">
     <div class="titlebar"><strong>FFGrab</strong><span id="outdir-label"></span></div>
 

@@ -102,3 +102,16 @@ def test_limpia_zip_si_descarga_falla(tmp_path):
         )
 
     assert list(destino.glob("*.zip")) == []
+
+
+def test_no_avisa_por_ceros_a_la_izquierda():
+    """yt-dlp reporta 2026.08.19 y PyPI publica 2026.8.19: son la misma."""
+    assert ytdlp_update_available(installed="2026.08.19", fetcher=lambda: "2026.8.19") is None
+
+
+def test_no_avisa_si_la_instalada_es_mas_nueva():
+    assert ytdlp_update_available(installed="2026.9.1", fetcher=lambda: "2026.8.19") is None
+
+
+def test_avisa_solo_si_pypi_es_realmente_posterior():
+    assert ytdlp_update_available(installed="2026.8.19", fetcher=lambda: "2026.9.1") == "2026.9.1"

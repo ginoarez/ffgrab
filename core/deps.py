@@ -151,7 +151,32 @@ def ytdlp_update_available(
     except Exception:
         return None
 
-    return ultima if ultima and ultima != installed else None
+    return ultima if _es_mas_nueva(ultima, installed) else None
+
+
+def _partes(version: str) -> tuple:
+    """Normaliza "2026.08.19" y "2026.8.19" a la misma tupla.
+
+    yt-dlp reporta su version con ceros a la izquierda y PyPI la publica
+    sin ellos, asi que compararlas como texto las da siempre por distintas
+    y el aviso de actualizacion saldria en cada arranque.
+    """
+    trozos = []
+    for parte in (version or "").split("."):
+        try:
+            trozos.append((0, int(parte)))
+        except ValueError:
+            trozos.append((1, parte))  # sufijos tipo 'post1' van despues
+    return tuple(trozos)
+
+
+def _es_mas_nueva(candidata: str | None, actual: str | None) -> bool:
+    if not candidata or not actual:
+        return False
+    try:
+        return _partes(candidata) > _partes(actual)
+    except TypeError:
+        return candidata != actual
 
 
 def _ultima_version_pypi() -> str:

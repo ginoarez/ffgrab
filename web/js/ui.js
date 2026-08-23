@@ -181,6 +181,57 @@
 
   window.FFGrab.alEstarListo(alArrancar);
 
+
+  /* --- compuerta de dependencias ---
+     Si falta ffmpeg la app no se muestra: se muestra el boton que lo instala.
+     Una interfaz que funciona hasta el final y revienta al unir el archivo es
+     el peor resultado posible. */
+  window.onFfmpegProgress = function (porcentaje) {
+    $("gate-fill").style.width = porcentaje + "%";
+  };
+
+  async function revisarDependencias() {
+    var estado = await window.FFGrab.call("deps_status");
+    if (!estado || estado.ok !== true) return;
+
+    if (estado.ffmpeg !== "found") {
+      if (estado.ffmpeg === "broken") {
+        $("gate-title").textContent = "ffmpeg está dañado";
+        $("gate-text").textContent =
+          "Se encontró ffmpeg pero no responde, así que el archivo está " +
+          "incompleto o corrupto. Descargar una copia nueva lo soluciona.";
+      }
+      $("gate").classList.remove("hidden");
+      return;
+    }
+    $("gate").classList.add("hidden");
+
+    if (estado.ytdlp_update) {
+      $("ytdlp-text").textContent =
+        "Hay una versión nueva de yt-dlp (" + estado.ytdlp_update + "). " +
+        "Los sitios cambian seguido y una copia vieja deja de funcionar.";
+      $("ytdlp-banner").classList.remove("hidden");
+    }
+  }
+
+  $("gate-install").addEventListener("click", async function () {
+    $("gate-install").disabled = true;
+    $("gate-install").textContent = "Descargando…";
+    $("gate-progress").classList.remove("hidden");
+    var r = await window.FFGrab.call("install_ffmpeg");
+    if (r && r.ok) {
+      revisarDependencias();
+      $("gate-install").disabled = false;
+      $("gate-install").textContent = "Descargar ffmpeg";
+      return;
+    }
+    $("gate-text").textContent = "No se pudo descargar: " + (r ? r.error : "error desconocido");
+    $("gate-install").disabled = false;
+    $("gate-install").textContent = "Reintentar";
+  });
+
+  window.FFGrab.alEstarListo(revisarDependencias);
+
   /* --- eventos --- */
   let temporizador = null;
   $("url").addEventListener("input", (evento) => {

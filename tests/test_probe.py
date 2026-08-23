@@ -109,3 +109,14 @@ def test_respuesta_vacia_es_no_disponible():
 
     with pytest.raises(VideoUnavailable):
         probe("https://ejemplo.com/v/x", ydl_factory=lambda: falso)
+
+
+def test_la_consulta_nunca_expande_una_lista():
+    """Un enlace con ?list= debe resolver el video, no la lista entera.
+
+    Sin esto, un enlace de radio de YouTube hace que yt-dlp extraiga decenas
+    de videos antes de responder, y la interfaz parece colgada.
+    """
+    from core.probe import _OPCIONES
+
+    assert _OPCIONES["noplaylist"] is True

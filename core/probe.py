@@ -4,7 +4,18 @@ from typing import Callable
 
 from .formats import VideoInfo, normalize
 
-_OPCIONES = {"quiet": True, "no_warnings": True, "skip_download": True}
+# noplaylist es imprescindible aqui, no solo al descargar: un enlace con
+# ?list= (YouTube genera listas de radio solo con darle a reproducir musica)
+# haria que yt-dlp extrajera la lista entera —decenas de videos— para
+# devolver uno. La consulta parece colgada cuando en realidad esta
+# trabajando de mas.
+_OPCIONES = {
+    "quiet": True,
+    "no_warnings": True,
+    "skip_download": True,
+    "noplaylist": True,
+    "noprogress": True,
+}
 
 _NO_DISPONIBLE = (
     "private video",

@@ -10,7 +10,7 @@ from tests.fixtures.info_dicts import VIDEO_CON_SUBTITULOS
 @pytest.fixture
 def api(tmp_path):
     instancia = Api(outdir=tmp_path)
-    instancia.window = None
+    instancia._window = None
     return instancia
 
 
@@ -152,7 +152,7 @@ def test_jobs_devuelve_lista_vacia_si_algo_falla(api, monkeypatch):
     def explota():
         raise RuntimeError("fallo simulado leyendo la cola")
 
-    monkeypatch.setattr(api.queue, "jobs", explota)
+    monkeypatch.setattr(api._queue, "jobs", explota)
 
     assert api.jobs() == []
 
@@ -162,6 +162,6 @@ def test_choose_folder_devuelve_none_si_la_ventana_falla(api):
         def create_file_dialog(self, *args, **kwargs):
             raise RuntimeError("fallo simulado en el diálogo nativo")
 
-    api.window = VentanaQueFalla()
+    api._window = VentanaQueFalla()
 
     assert api.choose_folder() is None

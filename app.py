@@ -34,9 +34,9 @@ class Api:
     """
 
     def __init__(self, outdir: Path | None = None):
-        self.window = None
-        self.outdir = Path(outdir) if outdir else Path.home() / "Downloads"
-        self.queue = DownloadQueue(runner=self._ejecutar, on_change=self._empujar)
+        self._window = None
+        self._outdir = Path(outdir) if outdir else Path.home() / "Downloads"
+        self._queue = DownloadQueue(runner=self._ejecutar, on_change=self._empujar)
         self._despierta = threading.Event()
         self._worker: threading.Thread | None = None
 
@@ -85,7 +85,7 @@ class Api:
 
     def enqueue(self, payload: dict) -> dict:
         try:
-            job = self.queue.enqueue(
+            job = self._queue.enqueue(
                 payload["url"], payload.get("title") or payload["url"], payload.get("options") or {}
             )
         except Exception as error:
@@ -97,30 +97,30 @@ class Api:
         # así que un {"ok": False} rompería esa iteración. Una lista vacía es
         # la respuesta segura que nunca deja de ser iterable.
         try:
-            return [_job_a_dict(j) for j in self.queue.jobs()]
+            return [_job_a_dict(j) for j in self._queue.jobs()]
         except Exception:
             return []
 
     def cancel(self, job_id: int) -> dict:
         try:
-            self.queue.cancel(int(job_id))
+            self._queue.cancel(int(job_id))
         except Exception as error:
             return {"ok": False, "error": str(error)}
         return {"ok": True}
 
     def current_folder(self) -> str:
-        return str(self.outdir)
+        return str(self._outdir)
 
     def choose_folder(self) -> str | None:
-        if self.window is None:
+        if self._window is None:
             return None
         try:
             import webview
 
-            elegido = self.window.create_file_dialog(webview.FOLDER_DIALOG)
+            elegido = self._window.create_file_dialog(webview.FOLDER_DIALOG)
             if elegido:
-                self.outdir = Path(elegido[0])
-                return str(self.outdir)
+                self._outdir = Path(elegido[0])
+                return str(self._outdir)
             return None
         except Exception:
             return None
@@ -131,8 +131,8 @@ class Api:
         estado = deps.ffmpeg_status()
         if estado.path is None:
             raise RuntimeError("ffmpeg no está disponible.")
-        self.outdir.mkdir(parents=True, exist_ok=True)
-        return download_mod.run(job, on_progress, str(estado.path), self.outdir)
+        self._outdir.mkdir(parents=True, exist_ok=True)
+        return download_mod.run(job, on_progress, str(estado.path), self._outdir)
 
     def _empujar(self, job: Job) -> None:
         self._evaluar("window.onJobChange", _job_a_dict(job))
@@ -141,10 +141,10 @@ class Api:
         self._evaluar("window.onFfmpegProgress", porcentaje)
 
     def _evaluar(self, funcion: str, dato) -> None:
-        if self.window is None:
+        if self._window is None:
             return
         try:
-            self.window.evaluate_js(f"{funcion}({json.dumps(dato)})")
+            self._window.evaluate_js(f"{funcion}({json.dumps(dato)})")
         except Exception:
             pass  # la ventana puede haberse cerrado a mitad de una descarga
 
@@ -172,7 +172,7 @@ class Api:
         hilo no.
         """
         try:
-            return self.queue.run_next() is not None
+            return self._queue.run_next() is not None
         except Exception:
             return True  # hubo un trabajo (aunque su aviso fallara); seguimos
 
@@ -184,7 +184,7 @@ def main() -> None:
     ventana = webview.create_window(
         "FFGrab", str(PAGINA), js_api=api, width=1000, height=640, min_size=(860, 560)
     )
-    api.window = ventana
+    api._window = ventana
     # Un único hilo persiste durante toda la vida de la app y va tomando los
     # trabajos pendientes. Arrancarlo aquí (y no dentro de cada enqueue())
     # evita que un enqueue() en caliente compita con quien lo llamó por leer

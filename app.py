@@ -3,12 +3,13 @@ from __future__ import annotations
 import dataclasses
 import json
 import threading
+import time
 from pathlib import Path
 
 from core import deps
 from core import download as download_mod
 from core import probe as probe_mod
-from core.queue import DownloadQueue, Job, JobState
+from core.queue import DownloadQueue, Job
 
 RAIZ = Path(__file__).resolve().parent
 PAGINA = RAIZ / "web" / "index.html"
@@ -38,7 +39,6 @@ class Api:
         self._outdir = Path(outdir) if outdir else Path.home() / "Downloads"
         self._queue = DownloadQueue(runner=self._ejecutar, on_change=self._empujar)
         self._cookies: dict = {}
-        self._despierta = threading.Event()
         self._worker: threading.Thread | None = None
 
     # ---- dependencias ----
@@ -207,7 +207,6 @@ class Api:
 
     def _asegurar_worker(self) -> None:
         if self._worker and self._worker.is_alive():
-            self._despierta.set()
             return
         self._worker = threading.Thread(target=self._bombear, daemon=True)
         self._worker.start()
@@ -215,8 +214,7 @@ class Api:
     def _bombear(self) -> None:
         while True:
             if not self._bombear_paso():
-                self._despierta.clear()
-                self._despierta.wait(timeout=1.0)
+                time.sleep(1.0)
 
     def _bombear_paso(self) -> bool:
         """Un pulso del bombeo: procesa un trabajo pendiente si lo hay.

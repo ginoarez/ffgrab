@@ -188,6 +188,38 @@ def test_run_reporta_progreso_y_devuelve_la_ruta(tmp_path):
     assert ruta == str(tmp_path / "video.mp4")
 
 
+def test_run_usa_requested_downloads_para_una_descarga_fusionada(tmp_path):
+    """El hook 'finished' dispara una vez por stream, ANTES de que ffmpeg
+    una video+audio: su filename es el stream temporal que yt-dlp borra al
+    terminar (aca, video.f251.webm), no el archivo final ya fusionado. La
+    ruta real esta en requested_downloads[0]['filepath'], que es lo que
+    run() debe devolver en vez del filename del hook."""
+    ruta_temporal = tmp_path / "video.f251.webm"
+    ruta_final = tmp_path / "video.mp4"
+
+    class YdlFalso:
+        def __init__(self, opts):
+            self.opts = opts
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def extract_info(self, url, download=True):
+            hook = self.opts["progress_hooks"][0]
+            hook({"status": "finished", "filename": str(ruta_temporal)})
+            return {"requested_downloads": [{"filepath": str(ruta_final)}]}
+
+    job = Job(id=1, url="https://ejemplo.com/a", title="video", options=_video())
+
+    ruta = run(job, lambda p, v: None, FFMPEG, tmp_path, ydl_factory=YdlFalso)
+
+    assert ruta == str(ruta_final)
+    assert ruta != str(ruta_temporal)
+
+
 def test_run_no_divide_por_cero_sin_tamano_total(tmp_path):
     reportes = []
 

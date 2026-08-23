@@ -150,6 +150,15 @@ def run(
         ydl_factory = YoutubeDL
 
     with ydl_factory(opts) as ydl:
-        ydl.extract_info(job.url, download=True)
+        info_dict = ydl.extract_info(job.url, download=True) or {}
 
+    # El hook "finished" dispara una vez por STREAM, antes del postprocesado
+    # (merge/incrustado): para una descarga que une video y audio, su
+    # filename es el stream temporal que yt-dlp borra al terminar
+    # (p. ej. "Titulo.f251.webm"), no el archivo final. requested_downloads
+    # trae la ruta real ya post-procesada; el filename del hook queda solo
+    # como respaldo para cuando esa clave no está.
+    descargas = info_dict.get("requested_downloads") or []
+    if descargas and descargas[0].get("filepath"):
+        return descargas[0]["filepath"]
     return resultado.get("path", "")

@@ -11,7 +11,6 @@ body {
 
 .neu     { background: var(--bg); border-radius: var(--radius);    box-shadow: var(--neu-out); }
 .neu-sm  { background: var(--bg); border-radius: var(--radius-sm); box-shadow: var(--neu-out-sm); }
-.neu-inset { background: var(--bg); border-radius: var(--radius-sm); box-shadow: var(--neu-in); }
 
 .label {
   font-size: 10px;

@@ -95,3 +95,73 @@ def test_cancel_marca_el_trabajo(api):
 
     assert resultado["ok"] is True
     assert api.jobs()[0]["state"] == "cancelled"
+
+
+def test_bombear_paso_sobrevive_a_un_fallo_en_on_change(api, monkeypatch):
+    """Si el aviso on_change revienta para un trabajo, el bombeo no debe
+    morir: el siguiente trabajo pendiente tiene que seguir procesándose.
+
+    Se prueba de forma sincrónica, llamando a `_bombear_paso()` directamente
+    en vez de levantar un hilo real: así se comprueba que el propio paso
+    nunca deja escapar la excepción (si la dejara escapar, esta prueba
+    fallaría con un error, no con un assert) y que el estado interno queda
+    en condiciones de seguir avanzando después, que es exactamente lo que
+    `_bombear()` hace en su bucle infinito.
+    """
+    monkeypatch.setattr(
+        "app.deps.ffmpeg_status",
+        lambda: FFmpegStatus(FFmpegState.FOUND, Path("/x/ffmpeg.exe"), "ffmpeg version 8.1.1"),
+    )
+    monkeypatch.setattr("app.download_mod.run", lambda *args, **kwargs: "/salida/video.mp4")
+
+    llamadas = {"n": 0}
+    evaluar_original = api._evaluar
+
+    def evaluar_que_revienta_la_primera_vez(funcion, dato):
+        llamadas["n"] += 1
+        if llamadas["n"] == 1:
+            raise RuntimeError("fallo simulado en el aviso a la ventana")
+        return evaluar_original(funcion, dato)
+
+    # Se encolan ANTES de parchear _evaluar: DownloadQueue.enqueue() también
+    # dispara on_change, y no queremos que ese aviso (al registrar el job)
+    # consuma el "revienta una vez" que buscamos activar recién en el bombeo.
+    trabajo_a = api.enqueue({"url": "https://ejemplo.com/a", "title": "A", "options": {}})["job"]
+    trabajo_b = api.enqueue({"url": "https://ejemplo.com/b", "title": "B", "options": {}})["job"]
+
+    monkeypatch.setattr(api, "_evaluar", evaluar_que_revienta_la_primera_vez)
+
+    # Primer pulso: toma A, su aviso de "paso a running" revienta. El paso no
+    # debe propagar esa excepción hacia afuera.
+    assert api._bombear_paso() is True
+
+    # Segundo pulso: A quedó atascado en "running" (la excepción interrumpió
+    # su procesamiento antes de llegar al runner), así que ahora le toca a B,
+    # cuyo aviso ya no revienta.
+    assert api._bombear_paso() is True
+
+    estados = {j["id"]: j["state"] for j in api.jobs()}
+    assert estados[trabajo_a["id"]] == "running"
+    assert estados[trabajo_b["id"]] == "done"
+
+    # No debería quedar nada más pendiente: el hilo seguiría vivo esperando.
+    assert api._bombear_paso() is False
+
+
+def test_jobs_devuelve_lista_vacia_si_algo_falla(api, monkeypatch):
+    def explota():
+        raise RuntimeError("fallo simulado leyendo la cola")
+
+    monkeypatch.setattr(api.queue, "jobs", explota)
+
+    assert api.jobs() == []
+
+
+def test_choose_folder_devuelve_none_si_la_ventana_falla(api):
+    class VentanaQueFalla:
+        def create_file_dialog(self, *args, **kwargs):
+            raise RuntimeError("fallo simulado en el diálogo nativo")
+
+    api.window = VentanaQueFalla()
+
+    assert api.choose_folder() is None

@@ -93,7 +93,13 @@ class Api:
         return {"ok": True, "job": _job_a_dict(job)}
 
     def jobs(self) -> list[dict]:
-        return [_job_a_dict(j) for j in self.queue.jobs()]
+        # A diferencia del resto: el JavaScript itera esta lista directamente,
+        # así que un {"ok": False} rompería esa iteración. Una lista vacía es
+        # la respuesta segura que nunca deja de ser iterable.
+        try:
+            return [_job_a_dict(j) for j in self.queue.jobs()]
+        except Exception:
+            return []
 
     def cancel(self, job_id: int) -> dict:
         try:
@@ -108,13 +114,16 @@ class Api:
     def choose_folder(self) -> str | None:
         if self.window is None:
             return None
-        import webview
+        try:
+            import webview
 
-        elegido = self.window.create_file_dialog(webview.FOLDER_DIALOG)
-        if elegido:
-            self.outdir = Path(elegido[0])
-            return str(self.outdir)
-        return None
+            elegido = self.window.create_file_dialog(webview.FOLDER_DIALOG)
+            if elegido:
+                self.outdir = Path(elegido[0])
+                return str(self.outdir)
+            return None
+        except Exception:
+            return None
 
     # ---- interno ----
 
@@ -148,9 +157,24 @@ class Api:
 
     def _bombear(self) -> None:
         while True:
-            if self.queue.run_next() is None:
+            if not self._bombear_paso():
                 self._despierta.clear()
                 self._despierta.wait(timeout=1.0)
+
+    def _bombear_paso(self) -> bool:
+        """Un pulso del bombeo: procesa un trabajo pendiente si lo hay.
+
+        Nunca deja escapar una excepción. `queue.run_next()` invoca el
+        callback on_change directamente, sin protegerlo: si ese aviso revienta
+        (por ejemplo, al serializar un job raro), la excepción subiría hasta
+        acá y mataría el único hilo trabajador para siempre, sin ningún
+        síntoma visible en la ventana. Perder un aviso es aceptable; perder el
+        hilo no.
+        """
+        try:
+            return self.queue.run_next() is not None
+        except Exception:
+            return True  # hubo un trabajo (aunque su aviso fallara); seguimos
 
 
 def main() -> None:

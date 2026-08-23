@@ -24,6 +24,9 @@ window.FFGrab.alEstarListo = function (fn) {
   var intentos = 0;
   var t = setInterval(function () {
     if (listo()) { clearInterval(t); fn(); }
-    else if (++intentos > 100) { clearInterval(t); }   // ~5s y se rinde
+    else if (++intentos > 1200) {                      // ~60s
+      clearInterval(t);
+      console.error("FFGrab: el puente con Python nunca estuvo disponible.");
+    }
   }, 50);
 };

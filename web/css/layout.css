@@ -1,0 +1,119 @@
+#app { height: 100vh; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding: 0 4px;
+}
+
+/* Clic para cambiar la carpeta de destino. */
+#outdir-label {
+  margin-left: auto;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  transition: box-shadow 0.12s ease;
+}
+
+#outdir-label:hover { box-shadow: var(--neu-out-sm); }
+
+.columns { flex: 1; display: flex; gap: 14px; min-height: 0; }
+.panel { padding: 18px; overflow-y: auto; }
+.panel-left  { flex: 1.15; }
+.panel-right { flex: 0.85; }
+
+.thumb {
+  width: 100%;
+  height: 132px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neu-in);
+  background: var(--bg);
+  display: block;
+}
+
+.meta-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 12px 0 3px;
+  line-height: 1.35;
+}
+
+.meta-sub { font-size: 11.5px; color: var(--ink-soft); margin-bottom: 14px; }
+
+.field { margin-bottom: 14px; }
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+
+.job {
+  padding: 12px 13px;
+  margin-bottom: 10px;
+}
+
+.job-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 7px;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+.job-cancel {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 10.5px;
+  padding: 0;
+}
+
+.job-cancel:hover { color: var(--danger); }
+.job.done   .progress-fill { opacity: 0.4; }
+.job.failed .job-foot { color: var(--danger); }
+
+.empty {
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+  padding: 34px 12px;
+  line-height: 1.6;
+}
+
+.hidden { display: none !important; }
+
+/* Compuerta de dependencias: ocupa todo, nada más se ve. */
+.gate {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.gate-card { padding: 34px 38px; max-width: 430px; text-align: center; }
+.gate-card h1 { font-size: 17px; margin: 0 0 12px; }
+.gate-card p { font-size: 12.5px; color: var(--ink-soft); line-height: 1.65; margin: 0 0 20px; }
+
+.banner {
+  padding: 11px 14px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}

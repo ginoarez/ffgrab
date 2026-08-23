@@ -1,0 +1,112 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+  user-select: none;
+}
+
+.neu     { background: var(--bg); border-radius: var(--radius);    box-shadow: var(--neu-out); }
+.neu-sm  { background: var(--bg); border-radius: var(--radius-sm); box-shadow: var(--neu-out-sm); }
+.neu-inset { background: var(--bg); border-radius: var(--radius-sm); box-shadow: var(--neu-in); }
+
+.label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+/* Entradas: hundidas, porque reciben algo en vez de sobresalir. */
+input[type="text"], select {
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  outline: none;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neu-in);
+}
+
+input[type="text"]::placeholder { color: var(--ink-soft); }
+
+.chip {
+  padding: 9px 12px;
+  border: none;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neu-out-sm);
+  transition: box-shadow 0.12s ease;
+}
+
+.chip:active, .chip[aria-pressed="true"] { box-shadow: var(--neu-press); }
+
+/* El acento existe solo aquí y en .progress-fill. En ningún otro lugar. */
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neu-out-sm);
+  transition: box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn-primary:active { box-shadow: var(--neu-press); }
+.btn-primary:disabled { opacity: 0.45; cursor: default; }
+
+.progress {
+  height: 8px;
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--neu-in);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 7px 0;
+}
+
+.toggle .box {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: var(--neu-out-sm);
+}
+
+.toggle input { display: none; }
+.toggle input:checked + .box { box-shadow: var(--neu-press); background: var(--accent); }

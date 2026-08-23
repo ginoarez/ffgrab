@@ -73,20 +73,24 @@
       .filter(Boolean)
       .join(" · ");
 
-    $("quality").innerHTML = info.qualities
-      .map((q, i) => `<option value="${i}">${q.label} · ${q.ext}${tamano(q)}</option>`)
-      .join("");
+    const quality = $("quality");
+    quality.replaceChildren();
+    info.qualities.forEach((q, i) => {
+      const opcion = new Option(`${q.label} · ${q.ext}${tamano(q)}`, String(i));
+      quality.appendChild(opcion);
+    });
 
-    const sinSubs = '<option value="">Sin subtítulos</option>';
-    $("subtitle").innerHTML =
-      sinSubs +
-      info.subtitles
-        .map(
-          (s) =>
-            `<option value="${s.lang_code}" data-auto="${s.is_auto}">` +
-            `${s.lang_name}${s.is_auto ? " (autogenerado)" : ""}</option>`
-        )
-        .join("");
+    const subtitle = $("subtitle");
+    subtitle.replaceChildren();
+    subtitle.appendChild(new Option("Sin subtítulos", ""));
+    info.subtitles.forEach((s) => {
+      const opcion = new Option(
+        `${s.lang_name}${s.is_auto ? " (autogenerado)" : ""}`,
+        s.lang_code
+      );
+      opcion.dataset.auto = String(s.is_auto);
+      subtitle.appendChild(opcion);
+    });
 
     $("mode-audio").disabled = false;
     if (info.qualities.length === 0) {

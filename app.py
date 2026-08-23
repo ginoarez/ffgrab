@@ -144,6 +144,24 @@ class Api:
         except Exception:
             return None
 
+    def choose_cookie_file(self) -> str | None:
+        """Abre un dialogo nativo para elegir un cookies.txt exportado.
+
+        Sigue exactamente la convencion de choose_folder: nunca lanza, y
+        devuelve una ruta desnuda (o None), no un sobre {ok: ...}.
+        """
+        if self._window is None:
+            return None
+        try:
+            import webview
+
+            elegido = self._window.create_file_dialog(webview.OPEN_DIALOG)
+            if elegido:
+                return str(elegido[0])
+            return None
+        except Exception:
+            return None
+
     # ---- interno ----
 
     def _ejecutar(self, job: Job, on_progress) -> str:

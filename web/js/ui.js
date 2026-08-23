@@ -149,16 +149,40 @@
      Muchos sitios rechazan la consulta anonima con una verificacion anti-bot.
      Leer las cookies del navegador donde ya hay sesion iniciada es el
      mecanismo que soporta yt-dlp para saltarla. */
+  var ultimoOrigenCookies = $("cookies").value;
+
   $("cookies").addEventListener("change", async function () {
-    var origen = $("cookies").value;
+    var select = $("cookies");
+    var origen = select.value;
+
+    if (origen === "__archivo__") {
+      var ruta = await window.FFGrab.call("choose_cookie_file");
+      if (typeof ruta !== "string" || !ruta) {
+        select.value = ultimoOrigenCookies;  // cancelado: no dejar el select colgado
+        return;
+      }
+      origen = "archivo:" + ruta;
+    }
+
     var r = await window.FFGrab.call("set_cookies", origen);
     var hint = $("cookies-hint");
     if (r && r.ok === false) {
       hint.textContent = "No se pudo usar esa sesión: " + r.error;
       hint.classList.remove("hidden");
+      select.value = ultimoOrigenCookies;
       return;
     }
-    hint.classList.add("hidden");
+
+    ultimoOrigenCookies = select.value;
+
+    if (select.value === "__archivo__") {
+      var nombre = origen.split(/[\\/]/).pop();
+      hint.textContent = "Usando " + nombre;
+      hint.classList.remove("hidden");
+    } else {
+      hint.classList.add("hidden");
+    }
+
     var url = $("url").value.trim();
     if (url) consultar(url);   // reintenta con la sesion nueva
   });

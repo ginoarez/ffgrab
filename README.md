@@ -37,7 +37,7 @@ Tres cosas que conviene saber, porque son fáciles de encontrarse:
 
 - **Firefox** suele funcionar sin problemas, pero solo sirve si tienes la sesión iniciada **en ese** navegador.
 - **Chrome y Edge** bloquean su base de datos de cookies mientras están abiertos, y las versiones recientes la cifran de forma que impide leerla. Ciérralos del todo antes de intentarlo.
-- Si nada de lo anterior funciona, exporta un `cookies.txt` con una extensión de navegador. FFGrab acepta esa ruta.
+- Si nada de lo anterior funciona, exporta un `cookies.txt` con una extensión de navegador y elige **"Archivo cookies.txt…"** en el desplegable Sesión para señalarlo.
 
 ## Certificados: si todo falla con `CERTIFICATE_VERIFY_FAILED`
 

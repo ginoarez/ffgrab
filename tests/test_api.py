@@ -167,3 +167,33 @@ def test_choose_folder_devuelve_none_si_la_ventana_falla(api):
     api._window = VentanaQueFalla()
 
     assert api.choose_folder() is None
+
+
+def test_choose_cookie_file_devuelve_la_ruta_elegida(api):
+    class VentanaQueElige:
+        def create_file_dialog(self, *args, **kwargs):
+            return ("C:/gente/cookies.txt",)
+
+    api._window = VentanaQueElige()
+
+    assert api.choose_cookie_file() == "C:/gente/cookies.txt"
+
+
+def test_choose_cookie_file_devuelve_none_si_cancela(api):
+    class VentanaQueCancela:
+        def create_file_dialog(self, *args, **kwargs):
+            return None
+
+    api._window = VentanaQueCancela()
+
+    assert api.choose_cookie_file() is None
+
+
+def test_choose_cookie_file_devuelve_none_si_la_ventana_falla(api):
+    class VentanaQueFalla:
+        def create_file_dialog(self, *args, **kwargs):
+            raise RuntimeError("fallo simulado en el diálogo nativo")
+
+    api._window = VentanaQueFalla()
+
+    assert api.choose_cookie_file() is None

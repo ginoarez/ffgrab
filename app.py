@@ -177,8 +177,27 @@ class Api:
             return True  # hubo un trabajo (aunque su aviso fallara); seguimos
 
 
+def _usar_certificados_del_sistema() -> None:
+    """Hace que Python valide TLS con el almacen de certificados de Windows.
+
+    Python solo confia en su propio paquete de certificados publicos. Cuando
+    un antivirus o un proxy corporativo inspecciona HTTPS, instala su raiz en
+    el almacen del sistema —que Windows si usa y Python no—, y toda conexion
+    falla con CERTIFICATE_VERIFY_FAILED aunque el navegador funcione. Sin
+    esto, yt-dlp no puede alcanzar ningun sitio en esas maquinas.
+    """
+    try:
+        import truststore
+
+        truststore.inject_into_ssl()
+    except Exception:
+        pass  # sin truststore se usa el comportamiento por defecto
+
+
 def main() -> None:
     import webview
+
+    _usar_certificados_del_sistema()
 
     api = Api()
     ventana = webview.create_window(

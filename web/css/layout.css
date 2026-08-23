@@ -117,3 +117,13 @@
   justify-content: space-between;
   gap: 12px;
 }
+
+/* Muestra job.error, que puede ser muy largo: se trunca para no empujar
+   el boton de cancelar fuera de la tarjeta. */
+.job-state {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  margin-right: 8px;
+}

@@ -21,8 +21,15 @@
         <span class="job-state"></span>
         <button class="job-cancel">Cancelar</button>
       </div>`;
-    nodo.querySelector(".job-cancel").addEventListener("click", () => {
-      window.FFGrab.call("cancel", job.id);
+    nodo.querySelector(".job-cancel").addEventListener("click", async () => {
+      // Sin mirar la respuesta, un fallo del backend dejaria al usuario
+      // pulsando un boton que no hace nada, sin rastro en ningun sitio.
+      const r = await window.FFGrab.call("cancel", job.id);
+      if (r && r.ok === false) {
+        const estado = nodo.querySelector(".job-state");
+        estado.textContent = "No se pudo cancelar: " + r.error;
+        estado.title = r.error;
+      }
     });
     contenedor.appendChild(nodo);
     tarjetas.set(job.id, nodo);

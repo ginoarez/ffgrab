@@ -12,8 +12,6 @@ Pegas un enlace, eliges calidad, formato, subtítulos e idioma, y lo encolas.
 <img src="https://img.shields.io/badge/PyInstaller-.exe-306998" alt="Se empaqueta a .exe con PyInstaller">
 <img src="https://img.shields.io/badge/licencia-MIT-3b82f6?logo=opensourceinitiative&logoColor=white" alt="Licencia MIT">
 
-<img src="https://img.shields.io/badge/tests-104%20%E2%9C%93-2ea44f?logo=pytest&logoColor=white" alt="104 tests en verde">
-
 <br>
 
 <img src="assets/captura-consulta.png" alt="FFGrab con un enlace consultado: título, miniatura, calidad, contenedor y subtítulos">
@@ -49,10 +47,12 @@ En Windows también funciona con doble clic en **`run.py`**. La primera vez crea
 
 ```bash
 pip install pyinstaller
-pyinstaller ffgrab.spec
+pyinstaller --onefile --windowed --name FFGrab --add-data "web;web" --collect-submodules yt_dlp app.py
 ```
 
 Deja `dist/FFGrab.exe`: un solo archivo, sin consola y sin dependencias que instalar. ffmpeg se descarga junto al ejecutable la primera vez.
+
+`--collect-submodules yt_dlp` no es opcional. yt-dlp importa sus extractores por nombre, en caliente, así que el análisis estático de PyInstaller no ve ninguno: sin esa bandera el `.exe` se construye igual y falla recién al consultar un enlace.
 
 **Aquí no hay ningún `.exe` publicado, a propósito.** Un binario suelto bajado de internet es justo lo que no conviene ejecutar a ciegas, y con el código a la vista puedes construir el tuyo y saber qué contiene.
 
@@ -114,14 +114,14 @@ Correr `pip install` contra el propio intérprete en caliente, en medio de una s
 
 </details>
 
-## Desarrollo
+## Cómo está armado
 
-```bash
-pip install pytest
-pytest          # 104 tests
-```
+El reparto es sencillo, y sostenerlo es lo que mantiene el proyecto manejable:
 
-El reparto es sencillo: `core/` habla con yt-dlp y ffmpeg y **no sabe nada de la interfaz**; `app.py` expone esa lógica al JavaScript y no contiene ninguna; `web/` es la ventana. Esa frontera es la razón de que la lógica se pueda probar sin abrir nada.
+- **`core/`** habla con yt-dlp y ffmpeg, y **no sabe nada de la interfaz**. Consulta enlaces, arma los formatos, corre la cola.
+- **`app.py`** expone esa lógica al JavaScript y no contiene ninguna. Ningún método suyo lanza excepciones: los errores viajan como datos.
+- **`web/`** es la ventana: HTML, CSS y JavaScript sin dependencias ni compilación.
+- **`run.py`** prepara el entorno y arranca. **`core/rutas.py`** separa lo que la app lee de lo que escribe, que es lo único que el empaquetado necesita saber.
 
 ## Créditos
 

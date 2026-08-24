@@ -14,22 +14,37 @@ Descargador de video de escritorio: eliges calidad, formato, subtítulos e idiom
 
 ## Instalación
 
-```bash
-git clone <url>
-cd ffgrab
-```
-
-Y en Windows, doble clic en **`run.bat`** (o `run.bat` desde la terminal). Crea un
-entorno local, instala las dependencias la primera vez y abre la app.
-
 Necesitas Python 3.11 o superior.
 
-> **Por qué un `.bat` y no `python app.py`.** En Windows suelen convivir varios
+```bash
+git clone https://github.com/ginoarez/ffgrab
+cd ffgrab
+python run.py
+```
+
+En Windows también funciona con doble clic en **`run.py`**. La primera vez crea
+un entorno local en `.venv`, instala las dependencias y abre la app; las
+siguientes va directo.
+
+> **Por qué `run.py` y no `python app.py`.** En Windows suelen convivir varios
 > Python: el de la Microsoft Store, el de python.org, entornos virtuales. Si
 > `python` resuelve a uno que no tiene las dependencias, la ventana abre igual
 > pero consultar un enlace se queda colgado para siempre, sin decir por qué. El
 > lanzador fija el intérprete y evita ese fallo, que es difícil de diagnosticar
-> precisamente porque la app *parece* arrancar bien.
+> precisamente porque la app *parece* arrancar bien. Si el Python que lo abre
+> es demasiado viejo, busca uno mejor en el sistema en vez de rendirse.
+
+### Un ejecutable, si lo prefieres
+
+```bash
+pip install pyinstaller
+pyinstaller ffgrab.spec
+```
+
+Deja `dist/FFGrab.exe`, sin consola y sin dependencias que instalar. No hay
+`.exe` publicado acá a propósito: un binario suelto descargado de internet es
+justo lo que no conviene ejecutar a ciegas, y con el código a la vista puedes
+construir el tuyo. ffmpeg se descarga junto al ejecutable la primera vez.
 
 ## Sobre ffmpeg
 
@@ -68,7 +83,7 @@ Esta herramienta es para contenido que tienes derecho a descargar. Respetar los 
 
 ## Trabajo futuro
 
-Playlists y canales completos · subtítulos incrustados sobre la imagen (burn-in) · empaquetado a `.exe` con PyInstaller · descargas paralelas configurables · recordar preferencias entre sesiones.
+Playlists y canales completos · subtítulos incrustados sobre la imagen (burn-in) · descargas paralelas configurables · recordar preferencias entre sesiones.
 
 **Deliberadamente fuera de esta versión:** un botón para actualizar yt-dlp desde la propia app. El aviso te dice que hay una versión nueva, pero actualizarla es correr `pip install -U yt-dlp` a mano. Correr `pip install` contra el propio intérprete en caliente, en medio de una sesión que puede tener una descarga corriendo, es frágil, y un paquete a medio actualizar bajo un proceso que sigue vivo es un mal modo de fallar. Mejor decir la verdad en el aviso que fingir que hay un botón.
 

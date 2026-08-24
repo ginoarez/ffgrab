@@ -10,7 +10,10 @@ from enum import Enum
 from pathlib import Path
 from typing import Callable
 
-BUNDLED_DIR = Path(__file__).resolve().parent.parent / "bin"
+from core import rutas
+
+# Junto al .exe cuando esta empaquetado, en la raiz del proyecto si no.
+BUNDLED_DIR = rutas.datos() / "bin"
 
 
 class FFmpegState(Enum):

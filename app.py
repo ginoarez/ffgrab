@@ -9,10 +9,10 @@ from pathlib import Path
 from core import deps
 from core import download as download_mod
 from core import probe as probe_mod
+from core import rutas
 from core.queue import DownloadQueue, Job
 
-RAIZ = Path(__file__).resolve().parent
-PAGINA = RAIZ / "web" / "index.html"
+PAGINA = rutas.recursos() / "web" / "index.html"
 
 
 def _job_a_dict(job: Job) -> dict:

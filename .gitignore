@@ -2,6 +2,8 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 bin/
+build/
+dist/
 descargas/
 .venv/
 venv/

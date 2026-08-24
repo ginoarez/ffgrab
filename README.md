@@ -1,12 +1,24 @@
+<div align="center">
+
 # FFGrab
 
-**Descargador de video de escritorio para Windows.** Pegas un enlace, eliges calidad, formato, subtítulos e idioma, y lo encolas.
+**Descargador de video de escritorio para Windows.**
+Pegas un enlace, eliges calidad, formato, subtítulos e idioma, y lo encolas.
 
-![Licencia MIT](https://img.shields.io/badge/licencia-MIT-3b82f6)
-![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3b82f6)
-![Plataforma Windows](https://img.shields.io/badge/plataforma-Windows-3b82f6)
+<img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white" alt="Python 3.11 o superior">
+<img src="https://img.shields.io/badge/motor-yt--dlp-c1121f" alt="Motor: yt-dlp">
+<img src="https://img.shields.io/badge/FFmpeg-incluido-007808?logo=ffmpeg&logoColor=white" alt="FFmpeg: se descarga solo">
+<img src="https://img.shields.io/badge/Windows-10_%2F_11-0078D4" alt="Windows 10 y 11">
+<img src="https://img.shields.io/badge/PyInstaller-.exe-306998" alt="Se empaqueta a .exe con PyInstaller">
+<img src="https://img.shields.io/badge/licencia-MIT-3b82f6?logo=opensourceinitiative&logoColor=white" alt="Licencia MIT">
 
-![FFGrab con un enlace consultado: título, miniatura, calidad, contenedor y subtítulos](assets/captura-consulta.png)
+<img src="https://img.shields.io/badge/tests-104%20%E2%9C%93-2ea44f?logo=pytest&logoColor=white" alt="104 tests en verde">
+
+<br>
+
+<img src="assets/captura-consulta.png" alt="FFGrab con un enlace consultado: título, miniatura, calidad, contenedor y subtítulos">
+
+</div>
 
 FFGrab es una ventana encima de [yt-dlp](https://github.com/yt-dlp/yt-dlp) y [FFmpeg](https://ffmpeg.org/), las dos herramientas que de verdad hacen el trabajo. Está para quien no quiere memorizar banderas de línea de comandos ni adivinar qué formato le va a servir: te muestra lo que hay disponible en un enlace y tú eliges, sin que la app decida por su cuenta a tus espaldas.
 

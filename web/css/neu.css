@@ -105,7 +105,33 @@ input[type="text"]::placeholder { color: var(--ink-soft); }
   border-radius: 6px;
   background: var(--bg);
   box-shadow: var(--neu-out-sm);
+  display: grid;
+  place-items: center;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
 }
+
+/* La palomita no aparece de golpe: se traza. El trazo arranca desplazado
+   fuera de su propio recorrido (dashoffset = longitud) y entra hasta cero al
+   marcar, asi que el gesto lee como escribir la marca, no como encenderla. */
+.toggle .box svg {
+  width: 13px;
+  height: 13px;
+  display: block;
+  overflow: visible;
+}
+
+.toggle .box svg path {
+  fill: none;
+  stroke: var(--accent-ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  transition: stroke-dashoffset 0.28s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.toggle input:checked + .box svg path { stroke-dashoffset: 0; }
 
 .toggle input { display: none; }
 .toggle input:checked + .box { box-shadow: var(--neu-press); background: var(--accent); }

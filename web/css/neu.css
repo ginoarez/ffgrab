@@ -122,7 +122,7 @@ input[type="text"]::placeholder { color: var(--ink-soft); }
 
 .toggle .box svg path {
   fill: none;
-  stroke: var(--accent-ink);
+  stroke: var(--ink);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -134,4 +134,4 @@ input[type="text"]::placeholder { color: var(--ink-soft); }
 .toggle input:checked + .box svg path { stroke-dashoffset: 0; }
 
 .toggle input { display: none; }
-.toggle input:checked + .box { box-shadow: var(--neu-press); background: var(--accent); }
+.toggle input:checked + .box { box-shadow: var(--neu-press); }
